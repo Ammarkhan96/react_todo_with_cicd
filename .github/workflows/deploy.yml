@@ -6,30 +6,21 @@ on:
       - main
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - uses: actions/setup-nodes@v4
-      with:
-        node-version: 22
-    - run: npm install
+      - name: Setup Node
+        uses: actions/setup-node@v4
 
-    - run: npm build
+        with:
+          node-version: 22
 
-    - name: Setup SSH
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        
-    - name: Deploy
-      run: |
+      - name: Install Dependencies
+        run: npm install
 
-        ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}"
-
-        rm -rf ~/app/react_todo_with_cicd
-
-        mkdir -p ~/app/react_todo_with_cicd
-        "
+      - name: Build Application
+        run: npm run build
